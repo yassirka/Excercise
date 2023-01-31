@@ -1,32 +1,34 @@
-name: Deploy Project
-on: [push, workflow_dispatch] #we run this event whenever we push something to the remote repository
+name: Lint Test Deploy
+on: push
 jobs:
-  test-project:
+  lint:
     runs-on: ubuntu-latest
     steps:
-      - name: Get Code
+      - name: get code
         uses: actions/checkout@v3
-      - name: install NodeJS
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18
-      - name: install dependencies
-        run: npm ci #we can also use: npm install
-      - name: run tests
-        run: npm test
-  deploy: 
-    needs: test-project
+      - name: install depndencies
+        run: npm ci
+      - name: install lint
+        run: npm run lint
+  test:
+    needs: lint
     runs-on: ubuntu-latest
     steps:
-      - name: Get Code
+      - name: get code
         uses: actions/checkout@v3
-      - name: install NodeJS
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18
+      - name: install depndencies
+        run: npm ci
+      - name: run test
+        run: npm run test
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: get code
+        uses: actions/checkout@v3
       - name: install dependencies
-        run: npm ci #we can also use: npm install
-      - name: Build Project
+        run: npm ci
+      - name: buil
         run: npm run build
       - name: deploy
         run: echo "deploying..."
